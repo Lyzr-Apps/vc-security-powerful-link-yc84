@@ -221,6 +221,143 @@ export default function Page() {
     }
   }, [])
 
+  // Robust JSON parsing: handles stringified JSON, nested objects, and various response shapes
+  const safeParse = (val: unknown): any => {
+    if (!val) return null
+    if (typeof val === 'object') return val
+    if (typeof val === 'string') {
+      try { return JSON.parse(val) } catch { return null }
+    }
+    return null
+  }
+
+  const extractCompaniesData = useCallback((result: any): { data: any; companiesList: CompanyData[] } => {
+    console.log('[AppSec Hub] Full raw result:', JSON.stringify(result, null, 2))
+
+    // Strategy: try multiple paths to find the companies array
+    const candidates: any[] = []
+
+    // Path 1: result.response.result (standard path)
+    const rr = result?.response?.result
+    if (rr) {
+      const parsed = safeParse(rr)
+      if (parsed) candidates.push(parsed)
+    }
+
+    // Path 2: result.response itself
+    if (result?.response && typeof result.response === 'object') {
+      candidates.push(result.response)
+    }
+
+    // Path 3: result.response.message might be stringified JSON
+    const msg = result?.response?.message
+    if (typeof msg === 'string') {
+      const parsed = safeParse(msg)
+      if (parsed) candidates.push(parsed)
+    }
+
+    // Path 4: result.raw_response
+    if (result?.raw_response) {
+      const parsed = safeParse(result.raw_response)
+      if (parsed) candidates.push(parsed)
+      // Also try parsed.response.result
+      if (parsed?.response?.result) {
+        const inner = safeParse(parsed.response.result)
+        if (inner) candidates.push(inner)
+      }
+    }
+
+    // Path 5: result itself
+    if (result && typeof result === 'object') {
+      candidates.push(result)
+    }
+
+    // Try each candidate for a companies array
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate?.companies) && candidate.companies.length > 0) {
+        // Validate first entry has company_name
+        const first = candidate.companies[0]
+        if (first && (first.company_name || first.name)) {
+          // Normalize: if field is "name" instead of "company_name", remap
+          const normalized = candidate.companies.map((c: any) => ({
+            company_name: c.company_name || c.name || '',
+            vc_investors: c.vc_investors || c.investors || '',
+            category: c.category || '',
+            founding_year: c.founding_year || c.founded || '',
+            total_funding: c.total_funding || c.funding || '',
+            latest_valuation: c.latest_valuation || c.valuation || '',
+            estimated_revenue: c.estimated_revenue || c.revenue || '',
+            core_offerings: c.core_offerings || c.offerings || c.products || '',
+            business_model: c.business_model || '',
+            pricing_strategy: c.pricing_strategy || c.pricing || '',
+            customer_segments: c.customer_segments || c.customers || '',
+            competitive_moat: c.competitive_moat || c.moat || '',
+            ai_capabilities: c.ai_capabilities || c.ai || '',
+            integration_ecosystem: c.integration_ecosystem || c.integrations || '',
+            differentiators_vs_checkmarx_tromzo: c.differentiators_vs_checkmarx_tromzo || c.differentiators || '',
+            opportunity_flag: c.opportunity_flag || c.flag || '',
+            opportunity_details: c.opportunity_details || c.opportunity || '',
+          }))
+          console.log('[AppSec Hub] Found companies via candidate:', normalized.length)
+          return { data: candidate, companiesList: normalized }
+        }
+      }
+    }
+
+    // Deep recursive search for any array with company_name fields
+    const deepSearch = (obj: any, depth: number): any[] | null => {
+      if (depth > 6 || !obj || typeof obj !== 'object') return null
+      if (Array.isArray(obj)) {
+        if (obj.length > 0 && obj[0] && (obj[0].company_name || obj[0].name)) return obj
+        return null
+      }
+      for (const key of Object.keys(obj)) {
+        const val = obj[key]
+        // Try parsing string values
+        if (typeof val === 'string' && val.length > 20) {
+          try {
+            const p = JSON.parse(val)
+            const found = deepSearch(p, depth + 1)
+            if (found) return found
+          } catch { /* skip */ }
+        }
+        if (typeof val === 'object' && val !== null) {
+          const found = deepSearch(val, depth + 1)
+          if (found) return found
+        }
+      }
+      return null
+    }
+
+    const deepFound = deepSearch(result, 0)
+    if (deepFound && deepFound.length > 0) {
+      console.log('[AppSec Hub] Found companies via deep search:', deepFound.length)
+      const normalized = deepFound.map((c: any) => ({
+        company_name: c.company_name || c.name || '',
+        vc_investors: c.vc_investors || c.investors || '',
+        category: c.category || '',
+        founding_year: c.founding_year || c.founded || '',
+        total_funding: c.total_funding || c.funding || '',
+        latest_valuation: c.latest_valuation || c.valuation || '',
+        estimated_revenue: c.estimated_revenue || c.revenue || '',
+        core_offerings: c.core_offerings || c.offerings || c.products || '',
+        business_model: c.business_model || '',
+        pricing_strategy: c.pricing_strategy || c.pricing || '',
+        customer_segments: c.customer_segments || c.customers || '',
+        competitive_moat: c.competitive_moat || c.moat || '',
+        ai_capabilities: c.ai_capabilities || c.ai || '',
+        integration_ecosystem: c.integration_ecosystem || c.integrations || '',
+        differentiators_vs_checkmarx_tromzo: c.differentiators_vs_checkmarx_tromzo || c.differentiators || '',
+        opportunity_flag: c.opportunity_flag || c.flag || '',
+        opportunity_details: c.opportunity_details || c.opportunity || '',
+      }))
+      return { data: candidates[0] || {}, companiesList: normalized }
+    }
+
+    console.warn('[AppSec Hub] No companies found in any path')
+    return { data: candidates[0] || {}, companiesList: [] }
+  }, [])
+
   const handleRunResearch = async (categories: string[], targets: string[], deepAnalysis: boolean) => {
     setLoading(true)
     setError(null)
@@ -239,20 +376,36 @@ Discover top VCs in each category, map their portfolio companies in AppSec/secur
       stopProgressSimulation()
 
       if (result.success) {
-        const data = result?.response?.result
-        const companiesData = Array.isArray(data?.companies) ? data.companies : []
-        setCompanies(companiesData as CompanyData[])
-        setTotalCompanies(data?.total_companies ?? String(companiesData.length))
+        const { data, companiesList } = extractCompaniesData(result)
+
+        console.log('[AppSec Hub] Extracted companies count:', companiesList.length)
+
+        if (companiesList.length === 0) {
+          // Still switch to results but show an error inline
+          setError('Research completed but no company data could be extracted. Check browser console for the raw response.')
+          setLoading(false)
+          return
+        }
+
+        setCompanies(companiesList)
+        setTotalCompanies(data?.total_companies ?? String(companiesList.length))
         setTotalVCs(data?.total_vcs_discovered ?? '0')
-        setAiEnabled(data?.ai_enabled_count ?? '0')
-        setHighOpportunity(data?.high_opportunity_count ?? '0')
-        setSummary(data?.summary ?? '')
+        setAiEnabled(data?.ai_enabled_count ?? String(companiesList.filter((c: CompanyData) => {
+          const ai = (c.ai_capabilities ?? '').toLowerCase()
+          return ai && ai !== 'none' && ai !== 'no' && ai !== 'n/a'
+        }).length))
+        setHighOpportunity(data?.high_opportunity_count ?? String(companiesList.filter((c: CompanyData) =>
+          (c.opportunity_flag ?? '').toUpperCase().includes('HIGH')
+        ).length))
+        setSummary(data?.summary ?? `Research complete. Found ${companiesList.length} companies across the AppSec landscape.`)
         setActiveView('results')
       } else {
+        console.error('[AppSec Hub] Agent returned failure:', result?.error, result)
         setError(result?.error ?? 'Research failed. Please try again.')
       }
     } catch (err) {
       stopProgressSimulation()
+      console.error('[AppSec Hub] Unexpected error:', err)
       setError(err instanceof Error ? err.message : 'An unexpected error occurred.')
     } finally {
       setLoading(false)
@@ -268,9 +421,23 @@ Discover top VCs in each category, map their portfolio companies in AppSec/secur
 
     try {
       const result = await callAIAgent(exportMessage, EXPORT_AGENT_ID)
+      console.log('[AppSec Hub] Export result:', JSON.stringify(result, null, 2))
 
       if (result.success) {
-        const files = result?.module_outputs?.artifact_files
+        // Try top-level module_outputs first
+        let files = result?.module_outputs?.artifact_files
+        // Fallback: check response.module_outputs
+        if (!Array.isArray(files) || files.length === 0) {
+          files = (result?.response as any)?.module_outputs?.artifact_files
+        }
+        // Fallback: check raw_response
+        if (!Array.isArray(files) || files.length === 0) {
+          try {
+            const raw = typeof result?.raw_response === 'string' ? JSON.parse(result.raw_response) : result?.raw_response
+            files = raw?.module_outputs?.artifact_files
+          } catch { /* skip */ }
+        }
+
         if (Array.isArray(files) && files.length > 0) {
           const url = files[0]?.file_url
           if (url) {
@@ -279,7 +446,7 @@ Discover top VCs in each category, map their portfolio companies in AppSec/secur
         }
       }
     } catch (err) {
-      // Silent fail for export -- the table remains visible
+      console.error('[AppSec Hub] Export error:', err)
     } finally {
       setExporting(false)
     }
