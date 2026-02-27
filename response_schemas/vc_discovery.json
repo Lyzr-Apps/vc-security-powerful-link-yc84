@@ -1,0 +1,30 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "AgentResponse",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "vcs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "vc_name": {"type": "string"},
+              "category": {"type": "string"},
+              "notable_appsec_investments": {"type": "string"},
+              "fund_size": {"type": "string"},
+              "investment_thesis": {"type": "string"}
+            },
+            "required": ["vc_name", "category", "notable_appsec_investments", "fund_size", "investment_thesis"],
+            "additionalProperties": false
+          }
+        },
+        "summary": {"type": "string"}
+      },
+      "required": ["vcs", "summary"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "AgentResponse",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "companies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "company_name": {"type": "string"},
+              "vc_investors": {"type": "string"},
+              "founding_year": {"type": "string"},
+              "latest_funding": {"type": "string"},
+              "total_funding": {"type": "string"},
+              "category": {"type": "string"},
+              "description": {"type": "string"}
+            },
+            "required": ["company_name", "vc_investors", "founding_year", "latest_funding", "total_funding", "category", "description"],
+            "additionalProperties": false
+          }
+        },
+        "summary": {"type": "string"}
+      },
+      "required": ["companies", "summary"],
+      "additionalProperties": false
+    }
+  }
+}

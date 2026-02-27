@@ -1,0 +1,18 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "AgentResponse",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "file_description": {"type": "string"},
+        "row_count": {"type": "string"},
+        "columns": {"type": "string"},
+        "status": {"type": "string"}
+      },
+      "required": ["file_description", "row_count", "columns", "status"],
+      "additionalProperties": false
+    }
+  }
+}

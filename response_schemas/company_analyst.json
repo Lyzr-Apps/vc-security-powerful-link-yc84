@@ -1,0 +1,39 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "AgentResponse",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "analyses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "company_name": {"type": "string"},
+              "estimated_revenue": {"type": "string"},
+              "total_funding": {"type": "string"},
+              "latest_valuation": {"type": "string"},
+              "core_offerings": {"type": "string"},
+              "business_model": {"type": "string"},
+              "pricing_strategy": {"type": "string"},
+              "customer_segments": {"type": "string"},
+              "competitive_moat": {"type": "string"},
+              "ai_capabilities": {"type": "string"},
+              "integration_ecosystem": {"type": "string"},
+              "differentiators_vs_checkmarx_tromzo": {"type": "string"},
+              "opportunity_flag": {"type": "string"},
+              "opportunity_details": {"type": "string"}
+            },
+            "required": ["company_name", "estimated_revenue", "total_funding", "latest_valuation", "core_offerings", "business_model", "pricing_strategy", "customer_segments", "competitive_moat", "ai_capabilities", "integration_ecosystem", "differentiators_vs_checkmarx_tromzo", "opportunity_flag", "opportunity_details"],
+            "additionalProperties": false
+          }
+        },
+        "summary": {"type": "string"}
+      },
+      "required": ["analyses", "summary"],
+      "additionalProperties": false
+    }
+  }
+}

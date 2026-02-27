@@ -1,0 +1,64 @@
+{
+  "agent_name": "Research Orchestrator",
+  "agent_id": "69a20ebc23280dbe33411587",
+  "description": "Coordinates the end-to-end research pipeline: routes VC focus parameters to discovery agent, passes discovered VCs to portfolio mapper, routes portfolio companies to analyst, and aggregates all results into a unified structured dataset",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "companies": [
+      {
+        "company_name": "string",
+        "vc_investors": "string",
+        "category": "string",
+        "founding_year": "string",
+        "total_funding": "string",
+        "latest_valuation": "string",
+        "estimated_revenue": "string",
+        "core_offerings": "string",
+        "business_model": "string",
+        "pricing_strategy": "string",
+        "customer_segments": "string",
+        "competitive_moat": "string",
+        "ai_capabilities": "string",
+        "integration_ecosystem": "string",
+        "differentiators_vs_checkmarx_tromzo": "string",
+        "opportunity_flag": "string",
+        "opportunity_details": "string"
+      }
+    ],
+    "total_companies": "string",
+    "total_vcs_discovered": "string",
+    "ai_enabled_count": "string",
+    "high_opportunity_count": "string",
+    "summary": "string"
+  },
+  "example_response": {
+    "companies": [
+      {
+        "company_name": "sample string",
+        "vc_investors": "sample string",
+        "category": "sample string",
+        "founding_year": "sample string",
+        "total_funding": "sample string",
+        "latest_valuation": "sample string",
+        "estimated_revenue": "sample string",
+        "core_offerings": "sample string",
+        "business_model": "sample string",
+        "pricing_strategy": "sample string",
+        "customer_segments": "sample string",
+        "competitive_moat": "sample string",
+        "ai_capabilities": "sample string",
+        "integration_ecosystem": "sample string",
+        "differentiators_vs_checkmarx_tromzo": "sample string",
+        "opportunity_flag": "sample string",
+        "opportunity_details": "sample string"
+      }
+    ],
+    "total_companies": "sample string",
+    "total_vcs_discovered": "sample string",
+    "ai_enabled_count": "sample string",
+    "high_opportunity_count": "sample string",
+    "summary": "sample string"
+  }
+}

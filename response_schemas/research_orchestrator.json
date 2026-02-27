@@ -1,0 +1,46 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "AgentResponse",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "companies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "company_name": {"type": "string"},
+              "vc_investors": {"type": "string"},
+              "category": {"type": "string"},
+              "founding_year": {"type": "string"},
+              "total_funding": {"type": "string"},
+              "latest_valuation": {"type": "string"},
+              "estimated_revenue": {"type": "string"},
+              "core_offerings": {"type": "string"},
+              "business_model": {"type": "string"},
+              "pricing_strategy": {"type": "string"},
+              "customer_segments": {"type": "string"},
+              "competitive_moat": {"type": "string"},
+              "ai_capabilities": {"type": "string"},
+              "integration_ecosystem": {"type": "string"},
+              "differentiators_vs_checkmarx_tromzo": {"type": "string"},
+              "opportunity_flag": {"type": "string"},
+              "opportunity_details": {"type": "string"}
+            },
+            "required": ["company_name", "vc_investors", "category", "founding_year", "total_funding", "latest_valuation", "estimated_revenue", "core_offerings", "business_model", "pricing_strategy", "customer_segments", "competitive_moat", "ai_capabilities", "integration_ecosystem", "differentiators_vs_checkmarx_tromzo", "opportunity_flag", "opportunity_details"],
+            "additionalProperties": false
+          }
+        },
+        "total_companies": {"type": "string"},
+        "total_vcs_discovered": {"type": "string"},
+        "ai_enabled_count": {"type": "string"},
+        "high_opportunity_count": {"type": "string"},
+        "summary": {"type": "string"}
+      },
+      "required": ["companies", "total_companies", "total_vcs_discovered", "ai_enabled_count", "high_opportunity_count", "summary"],
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {"id": "input_node", "type": "Input", "label": "User Query", "nodeCategory": "input"},
+    {"id": "manager_agent", "type": "Agent", "label": "Research Orchestrator", "nodeCategory": "agent"},
+    {"id": "vc_discovery_agent", "type": "Agent", "label": "VC Discovery Agent", "nodeCategory": "agent"},
+    {"id": "portfolio_mapper_agent", "type": "Agent", "label": "Portfolio Mapper Agent", "nodeCategory": "agent"},
+    {"id": "company_analyst_agent", "type": "Agent", "label": "Company Analyst Agent", "nodeCategory": "agent"},
+    {"id": "export_agent", "type": "Agent", "label": "Export Agent", "nodeCategory": "agent"},
+    {"id": "output_node", "type": "Output", "label": "Output", "nodeCategory": "end"}
+  ],
+  "edges": [
+    {"source": "input_node", "target": "manager_agent"},
+    {"source": "manager_agent", "target": "vc_discovery_agent"},
+    {"source": "manager_agent", "target": "portfolio_mapper_agent"},
+    {"source": "manager_agent", "target": "company_analyst_agent"},
+    {"source": "manager_agent", "target": "export_agent"},
+    {"source": "export_agent", "target": "output_node"}
+  ],
+  "agents": {
+    "manager": {"name": "Research Orchestrator", "agent_id": "69a20ebc23280dbe33411587"},
+    "vc_discovery": {"name": "VC Discovery Agent", "agent_id": "69a20ea1bf1c1e2382dd5ee7"},
+    "portfolio_mapper": {"name": "Portfolio Mapper Agent", "agent_id": "69a20ea1d73f4cc1b1e329c9"},
+    "company_analyst": {"name": "Company Analyst Agent", "agent_id": "69a20ea16688d7fdfe29fff5"},
+    "export": {"name": "Export Agent", "agent_id": "69a20ea2affa763185fc3884"}
+  }
+}
